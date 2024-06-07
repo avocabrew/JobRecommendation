@@ -9,6 +9,10 @@ from nltk.stem import WordNetLemmatizer
 import pickle
 import gdown
 import nltk
+import scipy
+
+# Check scipy version
+st.write(f"Scipy version: {scipy.__version__}")
 
 # Download NLTK data
 nltk.download('punkt')
@@ -44,7 +48,7 @@ try:
         components = pickle.load(f)
     glove_vectors = components.get('glove_vectors')
     corpus_embeddings = components.get('corpus_embeddings')
-except Exception as e:
+except ImportError as e:
     st.error(f"Error loading model components: {e}")
 
 # Check if corpus_embeddings is loaded correctly
