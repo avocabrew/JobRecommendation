@@ -27,7 +27,7 @@ gdown.download(url_model, output_model, quiet=False)
 
 # Load dataset
 try:
-    final_data = pd.read_csv('dataset.csv')
+    final_data = pd.read_csv(output_dataset)
 except Exception as e:
     st.error(f"Error loading dataset: {e}")
 
@@ -40,17 +40,16 @@ except Exception as e:
 
 # Load precomputed embeddings and dataset if available (to save time)
 try:
-    with open('model_components.pkl', 'rb') as f:
+    with open(output_model, 'rb') as f:
         components = pickle.load(f)
+    glove_vectors = components.get('glove_vectors')
+    corpus_embeddings = components.get('corpus_embeddings')
 except Exception as e:
     st.error(f"Error loading model components: {e}")
 
-# Load GloVe vectors
-try:
-    glove_vectors = components['glove_vectors']
-    corpus_embeddings = components['corpus_embeddings']
-except Exception as e:
-    st.error(f"Error extracting components: {e}")
+# Check if corpus_embeddings is loaded correctly
+if corpus_embeddings is None:
+    st.error("corpus_embeddings is not loaded correctly.")
 
 # Preprocessing tools
 stop_words = set(stopwords.words('english'))
@@ -112,31 +111,37 @@ if st.button('Search Jobs'):
             st.write('Too Many Filters, Reduce Filters!')
         else:
             filtered_indices = filtered_data.index
-            filtered_embeddings = corpus_embeddings[filtered_indices]
+            if corpus_embeddings is not None:
+                filtered_embeddings = corpus_embeddings[filtered_indices]
+            else:
+                st.error("corpus_embeddings is not available.")
+                filtered_embeddings = np.array([])
 
             # Preprocess and embed the new input text
             input_tokens = word_tokenize(new_text.lower())
             input_tokens = [lemmatizer.lemmatize(word) for word in input_tokens if word not in stop_words]
             input_embedding = get_average_glove(input_tokens, glove_vectors, num_features)
 
-            # Compute cosine similarities
-            cosine_sim_new = cosine_similarity([input_embedding], filtered_embeddings).flatten()
+            if filtered_embeddings.size > 0:
+                # Compute cosine similarities
+                cosine_sim_new = cosine_similarity([input_embedding], filtered_embeddings).flatten()
 
-            # Get top 10 similar jobs
-            top_3_indices = cosine_sim_new.argsort()[-3:][::-1]
-            top_3_titles = filtered_data.iloc[top_3_indices]['url_posting_pekerjaan']
+                # Get top 10 similar jobs
+                top_3_indices = cosine_sim_new.argsort()[-3:][::-1]
+                top_3_titles = filtered_data.iloc[top_3_indices]['url_posting_pekerjaan']
 
-            isBreak = False
-            for i, index in enumerate(top_3_indices, 1):
-                if cosine_sim_new[index] < 0.6:
-                    st.write('Your Skill Description is Too Short, Add More Details!')
-                    isBreak = True
-                    break
-            
-            if not isBreak:
-                st.write("Top 3 Jobs for You:")
-                for i, title in enumerate(top_3_titles, 1):
-                    st.write(f"{i}. {title}.")
-            
+                isBreak = False
+                for i, index in enumerate(top_3_indices, 1):
+                    if cosine_sim_new[index] < 0.6:
+                        st.write('Your Skill Description is Too Short, Add More Details!')
+                        isBreak = True
+                        break
+
+                if not isBreak:
+                    st.write("Top 3 Jobs for You:")
+                    for i, title in enumerate(top_3_titles, 1):
+                        st.write(f"{i}. {title}.")
+            else:
+                st.write("No jobs available for the selected filters.")
     else:
         st.write("Enter a skill description to search for matching jobs.")
