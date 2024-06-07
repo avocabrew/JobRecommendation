@@ -26,19 +26,31 @@ output_model = 'model_components.pkl'
 gdown.download(url_model, output_model, quiet=False)
 
 # Load dataset
-final_data = pd.read_csv('dataset.csv')
+try:
+    final_data = pd.read_csv('dataset.csv')
+except Exception as e:
+    st.error(f"Error loading dataset: {e}")
 
-final_data = final_data[final_data.state != 'No Info']
-final_data['state'] = final_data['state'].str.title()
-final_data['city'] = final_data['city'].str.title()
+try:
+    final_data = final_data[final_data.state != 'No Info']
+    final_data['state'] = final_data['state'].str.title()
+    final_data['city'] = final_data['city'].str.title()
+except Exception as e:
+    st.error(f"Error processing dataset: {e}")
 
 # Load precomputed embeddings and dataset if available (to save time)
-with open('model_components.pkl', 'rb') as f:
-    components = pickle.load(f)
+try:
+    with open('model_components.pkl', 'rb') as f:
+        components = pickle.load(f)
+except Exception as e:
+    st.error(f"Error loading model components: {e}")
 
 # Load GloVe vectors
-glove_vectors = components['glove_vectors']
-corpus_embeddings = components['corpus_embeddings']
+try:
+    glove_vectors = components['glove_vectors']
+    corpus_embeddings = components['corpus_embeddings']
+except Exception as e:
+    st.error(f"Error extracting components: {e}")
 
 # Preprocessing tools
 stop_words = set(stopwords.words('english'))
@@ -55,30 +67,33 @@ def get_average_glove(tokens, model, num_features):
 st.title('Job Recommendation System US Based')
 
 # Dropdown for category selection
-state_option = final_data['state'].unique()
-state_option = np.sort(state_option)
-type_options = final_data['jenis_pekerjaan'].unique()
-sponsor_options = final_data['disponsori'].unique()
-apply_options = final_data['tipe_pendaftaran'].unique()
+try:
+    state_option = final_data['state'].unique()
+    state_option = np.sort(state_option)
+    type_options = final_data['jenis_pekerjaan'].unique()
+    sponsor_options = final_data['disponsori'].unique()
+    apply_options = final_data['tipe_pendaftaran'].unique()
 
-state_option = np.concatenate([np.array(['Any']), state_option])
-type_options = np.concatenate([np.array(['Any']), type_options])
-sponsor_options = np.concatenate([np.array(['Any']), sponsor_options])
-apply_options = np.concatenate([np.array(['Any']), apply_options])
+    state_option = np.concatenate([np.array(['Any']), state_option])
+    type_options = np.concatenate([np.array(['Any']), type_options])
+    sponsor_options = np.concatenate([np.array(['Any']), sponsor_options])
+    apply_options = np.concatenate([np.array(['Any']), apply_options])
 
-selected_state = st.selectbox('Select State', state_option)
-if selected_state == 'Any':
-    city_option = ['Any']
-else:
-    city_option = final_data[final_data['state'] == selected_state]['city'].unique()
-    city_option = np.concatenate([np.array(['Any']), city_option])
+    selected_state = st.selectbox('Select State', state_option)
+    if selected_state == 'Any':
+        city_option = ['Any']
+    else:
+        city_option = final_data[final_data['state'] == selected_state]['city'].unique()
+        city_option = np.concatenate([np.array(['Any']), city_option])
 
-city_option = np.sort(city_option)
+    city_option = np.sort(city_option)
 
-selected_city = st.selectbox('Select City', city_option)
-selected_type = st.selectbox('Select Job Type', type_options)
-selected_sponsor = st.selectbox('Select Sponsor Type', sponsor_options)
-selected_apply = st.selectbox('Select Application Type', apply_options)
+    selected_city = st.selectbox('Select City', city_option)
+    selected_type = st.selectbox('Select Job Type', type_options)
+    selected_sponsor = st.selectbox('Select Sponsor Type', sponsor_options)
+    selected_apply = st.selectbox('Select Application Type', apply_options)
+except Exception as e:
+    st.error(f"Error in dropdown selection: {e}")
 
 city_filter = (final_data['city'] == selected_city) if selected_state != 'Any' else (final_data['city'] == final_data['city'])
 type_filter = (final_data['jenis_pekerjaan'] == selected_type) if selected_type != 'Any' else (final_data['jenis_pekerjaan'] == final_data['jenis_pekerjaan'])
