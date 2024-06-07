@@ -6,15 +6,23 @@ from sklearn.metrics.pairwise import cosine_similarity
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-from sklearn.metrics.pairwise import cosine_similarity
 import pickle
-
-
+import gdown
 import nltk
+
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
+# Mengunduh dataset dari Google Drive
+url_dataset = 'https://drive.google.com/uc?id=18EORKlxjQ-bPz7YqZSHaVHQFUAN0mENI'
+output_dataset = 'dataset.csv'
+gdown.download(url_dataset, output_dataset, quiet=False)
+
+# Mengunduh model dari Google Drive
+url_model = 'https://drive.google.com/uc?id=1c7uj8FpTRU-xb_kIVWHv0wzDos34Fa-M'
+output_model = 'model_components.pkl'
+gdown.download(url_model, output_model, quiet=False)
 
 # Load dataset
 final_data = pd.read_csv('dataset.csv')
