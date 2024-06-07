@@ -10,12 +10,13 @@ import pickle
 import gdown
 import nltk
 
+# Download NLTK data
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
 # Mengunduh dataset dari Google Drive
-url_dataset = 'https://drive.google.com/uc?id=18EORKlxjQ-bPz7YqZSHaVHQFUAN0mENI'
+url_dataset = 'https://drive.google.com/uc?id=10t5AQA0afmRD4Zl8gP_5WUXIZ5_C0NcR'
 output_dataset = 'dataset.csv'
 gdown.download(url_dataset, output_dataset, quiet=False)
 
