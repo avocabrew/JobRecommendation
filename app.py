@@ -11,9 +11,6 @@ import gdown
 import nltk
 import scipy
 
-# Check scipy version
-st.write(f"Scipy version: {scipy.__version__}")
-
 # Download NLTK data
 nltk.download('punkt')
 nltk.download('stopwords')
