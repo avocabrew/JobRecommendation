@@ -20,7 +20,7 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 
 # Mengunduh dataset dari Google Drive
-url_dataset = 'https://drive.google.com/uc?id=10t5AQA0afmRD4Zl8gP_5WUXIZ5_C0NcR'
+url_dataset = 'https://drive.google.com/uc?id=188LD07j1VqtjuFXheIstIsrXHGZ1UD_4'
 output_dataset = 'dataset.csv'
 gdown.download(url_dataset, output_dataset, quiet=False)
 
