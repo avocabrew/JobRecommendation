@@ -16,10 +16,8 @@ nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Mengunduh dataset dari Google Drive
-url_dataset = 'https://drive.google.com/uc?id=188LD07j1VqtjuFXheIstIsrXHGZ1UD_4'
-output_dataset = 'dataset.csv'
-gdown.download(url_dataset, output_dataset, quiet=False)
+# Load dataset
+final_data = pd.read_csv('dataset.csv')
 
 # Mengunduh model dari Google Drive
 url_model = 'https://drive.google.com/uc?id=1c7uj8FpTRU-xb_kIVWHv0wzDos34Fa-M'
